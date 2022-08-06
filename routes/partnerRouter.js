@@ -1,5 +1,6 @@
 const express = require("express");
 const partnerRouter = express.Router();
+const authenticate = require("../authenticate");
 
 partnerRouter
   .route("/")
@@ -11,16 +12,16 @@ partnerRouter
   .get((req, res) => {
     res.end("Will send all the partners to you");
   })
-  .post((req, res) => {
+  .post(authenticate.verifyUser, (req, res) => {
     res.end(
       `Will add the partner: ${req.body.name} with description: ${req.body.description}`
     );
   })
-  .put((req, res) => {
+  .put(authenticate.verifyUser, (req, res) => {
     res.statusCode = 403;
     res.end("PUT operation not supported on /partners");
   })
-  .delete((req, res) => {
+  .delete(authenticate.verifyUser, (req, res) => {
     res.end("Deleting all partners");
   });
 
@@ -36,16 +37,16 @@ partnerRouter
       `Will send details of the partner with the id of ${req.params.partnerId}`
     );
   })
-  .post((req, res) => {
+  .post(authenticate.verifyUser, (req, res) => {
     res.statusCode = 403;
     res.end(`POST operation not supported on /partner/${req.params.partnerId}`);
   })
-  .put((req, res) => {
+  .put(authenticate.verifyUser, (req, res) => {
     res.end(
       `Will update the partners: ${req.body.name} with description ${req.body.description}`
     );
   })
-  .delete((req, res) => {
+  .delete(authenticate.verifyUser, (req, res) => {
     res.end(`Deleting partner of id: ${req.params.partnerId}`);
   });
 
