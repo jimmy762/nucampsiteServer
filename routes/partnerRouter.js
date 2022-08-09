@@ -1,13 +1,20 @@
+const { application } = require("express");
 const express = require("express");
+const Partner = require("../models/partner");
+
 const partnerRouter = express.Router();
 const authenticate = require("../authenticate");
 
 partnerRouter
   .route("/")
-  .all((req, res, next) => {
-    res.statusCode = 200;
-    res.setHeader("Content-Type", "text/plain");
-    next();
+  .get((req, res, next) => {
+    Partner.find()
+      .then((partners) => {
+        res.statusCode = 200;
+        res.header("Content-Type", "application/json");
+        res.json(partners);
+      })
+      .catch((err) => next(err));
   })
   .get((req, res) => {
     res.end("Will send all the partners to you");
@@ -27,15 +34,14 @@ partnerRouter
 
 partnerRouter
   .route("/:partnerId")
-  .all((req, res, next) => {
-    res.statusCode = 200;
-    res.setHeader("Content-Type", "text/plain");
-    next();
-  })
-  .get((req, res) => {
-    res.end(
-      `Will send details of the partner with the id of ${req.params.partnerId}`
-    );
+  .get((req, res, next) => {
+    Partner.findById(req.params.partnerId)
+      .then((partner) => {
+        res.statusCode = 200;
+        res.header("Content-Type", "application/json");
+        res.json(partner);
+      })
+      .catch((err) => next(err));
   })
   .post(authenticate.verifyUser, (req, res) => {
     res.statusCode = 403;

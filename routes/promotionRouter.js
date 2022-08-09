@@ -1,13 +1,20 @@
+const { application } = require("express");
 const express = require("express");
+const Promotion = require("../models/promotion");
+
 const promotionRouter = express.Router();
 const authenticate = require("../authenticate");
 
 promotionRouter
   .route("/")
-  .all((req, res, next) => {
-    res.statusCode = 200;
-    res.setHeader("Content-Type", "text/plain");
-    next();
+  .get((req, res, next) => {
+    Promotion.find()
+      .then((promotions) => {
+        res.statusCode = 200;
+        res.header("Content-Type", "application/json");
+        res.json(promotions);
+      })
+      .catch((err) => next(err));
   })
   .get((req, res) => {
     res.end("Will send all the promotions to you");
@@ -27,15 +34,14 @@ promotionRouter
 
 promotionRouter
   .route("/:promotionId")
-  .all((req, res, next) => {
-    res.statusCode = 200;
-    res.setHeader("Content-Type", "text/plain");
-    next();
-  })
-  .get((req, res) => {
-    res.end(
-      `Will send details of the promotion with the id of ${req.params.promotionId}`
-    );
+  .get((req, res, next) => {
+    Promotion.findById(req.params.promotionId)
+      .then((promotion) => {
+        res.statusCode = 200;
+        res.header("Content-Type", "application/json");
+        res.json(promotion);
+      })
+      .catch((err) => next(err));
   })
   .post(authenticate.verifyUser, (req, res) => {
     res.statusCode = 403;
