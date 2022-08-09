@@ -12,7 +12,7 @@ promotionRouter
   .get((req, res) => {
     res.end("Will send all the promotions to you");
   })
-  .post(authenticate.verifyUser, (req, res) => {
+  .post(authenticate.verifyUser, authenticate.verifyAdmin, (req, res) => {
     res.end(
       `Will add the promotion: ${req.body.name} with description: ${req.body.description}`
     );
@@ -21,7 +21,7 @@ promotionRouter
     res.statusCode = 403;
     res.end("PUT operation not supported on /promotions");
   })
-  .delete(authenticate.verifyUser, (req, res) => {
+  .delete(authenticate.verifyUser, authenticate.verifyAdmin, (req, res) => {
     res.end("Deleting all promotions");
   });
 
@@ -43,12 +43,12 @@ promotionRouter
       `POST operation not supported on /promotion/${req.params.promotionId}`
     );
   })
-  .put(authenticate.verifyUser, (req, res) => {
+  .put(authenticate.verifyUser, authenticate.verifyAdmin, (req, res) => {
     res.end(
       `Will update the promotions: ${req.body.name} with description ${req.body.description}`
     );
   })
-  .delete(authenticate.verifyUser, (req, res) => {
+  .delete(authenticate.verifyUser, authenticate.verifyAdmin, (req, res) => {
     res.end(`Deleting promotion of id: ${req.params.promotionId}`);
   });
 
