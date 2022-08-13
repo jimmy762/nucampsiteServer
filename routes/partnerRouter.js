@@ -1,13 +1,15 @@
 const { application } = require("express");
 const express = require("express");
 const Partner = require("../models/partner");
+const cors = require("./cors");
 
 const partnerRouter = express.Router();
 const authenticate = require("../authenticate");
 
 partnerRouter
   .route("/")
-  .get((req, res, next) => {
+  .options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+  .get(cors.cors, (req, res, next) => {
     Partner.find()
       .then((partners) => {
         res.statusCode = 200;
@@ -16,25 +18,38 @@ partnerRouter
       })
       .catch((err) => next(err));
   })
-  .get((req, res) => {
-    res.end("Will send all the partners to you");
-  })
-  .post(authenticate.verifyUser, authenticate.verifyAdmin, (req, res) => {
-    res.end(
-      `Will add the partner: ${req.body.name} with description: ${req.body.description}`
-    );
-  })
-  .put(authenticate.verifyUser, (req, res) => {
-    res.statusCode = 403;
-    res.end("PUT operation not supported on /partners");
-  })
-  .delete(authenticate.verifyUser, authenticate.verifyAdmin, (req, res) => {
-    res.end("Deleting all partners");
-  });
+  .post(
+    cors.corsWithOptions,
+    authenticate.verifyUser,
+    authenticate.verifyAdmin,
+    (req, res) => {
+      res.end(
+        `Will add the partner: ${req.body.name} with description: ${req.body.description}`
+      );
+    }
+  )
+  .put(
+    cors.corsWithOptions,
+    authenticate.verifyUser,
+    authenticate.verifyAdmin,
+    (req, res) => {
+      res.statusCode = 403;
+      res.end("PUT operation not supported on /partners");
+    }
+  )
+  .delete(
+    cors.corsWithOptions,
+    authenticate.verifyUser,
+    authenticate.verifyAdmin,
+    (req, res) => {
+      res.end("Deleting all partners");
+    }
+  );
 
 partnerRouter
   .route("/:partnerId")
-  .get((req, res, next) => {
+  .options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+  .get(cors.cors, (req, res, next) => {
     Partner.findById(req.params.partnerId)
       .then((partner) => {
         res.statusCode = 200;
@@ -43,17 +58,34 @@ partnerRouter
       })
       .catch((err) => next(err));
   })
-  .post(authenticate.verifyUser, (req, res) => {
-    res.statusCode = 403;
-    res.end(`POST operation not supported on /partner/${req.params.partnerId}`);
-  })
-  .put(authenticate.verifyUser, authenticate.verifyAdmin, (req, res) => {
-    res.end(
-      `Will update the partners: ${req.body.name} with description ${req.body.description}`
-    );
-  })
-  .delete(authenticate.verifyUser, authenticate.verifyAdmin, (req, res) => {
-    res.end(`Deleting partner of id: ${req.params.partnerId}`);
-  });
+  .post(
+    cors.corsWithOptions,
+    authenticate.verifyUser,
+    authenticate.verifyAdmin,
+    (req, res) => {
+      res.statusCode = 403;
+      res.end(
+        `POST operation not supported on /partner/${req.params.partnerId}`
+      );
+    }
+  )
+  .put(
+    cors.corsWithOptions,
+    authenticate.verifyUser,
+    authenticate.verifyAdmin,
+    (req, res) => {
+      res.end(
+        `Will update the partners: ${req.body.name} with description ${req.body.description}`
+      );
+    }
+  )
+  .delete(
+    cors.corsWithOptions,
+    authenticate.verifyUser,
+    authenticate.verifyAdmin,
+    (req, res) => {
+      res.end(`Deleting partner of id: ${req.params.partnerId}`);
+    }
+  );
 
 module.exports = partnerRouter;
